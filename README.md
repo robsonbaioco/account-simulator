@@ -7,15 +7,15 @@ Esta API permite que o usuário:
   
 - consulte saldo;
 
-- através do endpoint: `/api/contas/{number}/saldo`
+	- através do endpoint: `/api/contas/{number}/saldo`
 
 - realize um saque;
 
-- através do endpoint: `/api/contas/{number}/sacar/{value}`
+	- através do endpoint: `/api/contas/{number}/sacar/{value}`
 
 - realize um depósito;
 
-- através do endpoint: `/api/contas/{number}/depositar/{value}`
+	- através do endpoint: `/api/contas/{number}/depositar/{value}`
 
  Há também um endpoint adicional para consultar as contas cadastradas no banco, de modo que o usuário possa escolher uma conta para usar nos endpoints anteriormente listados, a listagem de todas as contas cadastradas no sistema pode ser feita através do endpoint: `/api/contas`
 
