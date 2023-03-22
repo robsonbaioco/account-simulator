@@ -1,5 +1,3 @@
 /.env
 /vendor
-/composer.lock
-/composer.json
 /.phpunit.result.cache
