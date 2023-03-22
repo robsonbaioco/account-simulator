@@ -30,8 +30,8 @@ Crie um arquivo .env, você pode criar manualmente ou utilizar o comando `cp .en
 
 ### Configurando o Laravel
 
- - Execute o comando `docker-compose exec app php artisan key:generate   `
- - -Execute o comando `docker-compose exec app php artisan config:cache`
+ - Execute o comando `docker-compose exec app php artisan key:generate`
+ - Execute o comando `docker-compose exec app php artisan config:cache`
 
 ### Configurando banco de dados local (opcional)
 Esta etapa é opcional, você pode optar por usar um banco de dados remoto previamente configurado, mas caso tenha optado por seguir com o banco de dados local, siga os seguintes passos:
