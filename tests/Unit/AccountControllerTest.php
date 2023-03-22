@@ -54,6 +54,10 @@ class AccountControllerTest extends TestCase
      */
     public function testSaqueContaExistenteSaldoSuficiente()
     {
+        // Inicia uma transação
+        DB::beginTransaction();
+
+        // Cria uma conta com saldo de R$ 1000,00
         $account = Account::factory()->create(['balance' => 1000]);
 
         $response = $this->json('POST', '/api/contas/' . $account->number . '/sacar/500');
@@ -67,6 +71,9 @@ class AccountControllerTest extends TestCase
             'number' => $account->number,
             'balance' => 500,
         ]);
+
+        // Desfaz as alterações no banco de dados
+        DB::rollBack();
     }
 
     /**
@@ -76,8 +83,13 @@ class AccountControllerTest extends TestCase
      */
     public function testSaqueContaExistenteSaldoInsuficiente()
     {
+        // Inicia uma transação
+        DB::beginTransaction();
+
+        // Cria uma conta com saldo de R$ 1000,00
         $account = Account::factory()->create(['balance' => 1000]);
 
+        // Chama a rota para sacar R$ 1001,00 da conta criada
         $response = $this->json('POST', '/api/contas/' . $account->number . '/sacar/1001');
 
         $response->assertStatus(400)
@@ -89,6 +101,9 @@ class AccountControllerTest extends TestCase
             'number' => $account->number,
             'balance' => 1000,
         ]);
+
+        // Desfaz as alterações no banco de dados
+        DB::rollBack();
     }
 
     /**
@@ -98,6 +113,9 @@ class AccountControllerTest extends TestCase
      */
     public function testDepositoContaExistente()
     {
+        // Inicia uma transação
+        DB::beginTransaction();
+
         // Cria uma conta
         $account = Account::factory()->create();
 
@@ -112,8 +130,16 @@ class AccountControllerTest extends TestCase
             'conta' => $account->number,
             'saldo' => $account->balance + 100
         ]);
+
+        // Desfaz as alterações no banco de dados
+        DB::rollBack();
     }
 
+    /**
+     * Teste para verificar o depósito em uma conta inexistente.
+     *
+     * @return void
+     */
     public function testDepositoContaInexistente()
     {
         // Chama a rota para depositar R$ 100,00 em uma conta que não existe
@@ -126,8 +152,16 @@ class AccountControllerTest extends TestCase
         $response->assertJson(['error' => 'Conta não encontrada']);
     }
 
+    /**
+     * Teste para verificar o saque de uma conta existente com saldo suficiente.
+     *
+     * @return void
+     */
     public function testSaqueContaExistenteComSaldoSuficiente()
     {
+        // Inicia uma transação
+        DB::beginTransaction();
+
         // Cria uma conta com saldo de R$ 500,00
         $account = Account::factory()->create(['balance' => 500]);
 
@@ -141,8 +175,16 @@ class AccountControllerTest extends TestCase
         $response->assertJson([
             'saldo' => $account->balance - 100
         ]);
+
+        // Desfaz as alterações no banco de dados
+        DB::rollBack();
     }
 
+    /**
+     * Teste para verificar o saque de uma conta existente com saldo insuficiente.
+     *
+     * @return void
+     */
     public function testSaqueContaExistenteComSaldoInsuficiente()
     {
         // Cria uma conta com saldo de R$ 50,00
@@ -158,6 +200,11 @@ class AccountControllerTest extends TestCase
         $response->assertJson(['error' => 'Saldo insuficiente']);
     }
 
+    /**
+     * Teste para verificar o saque de uma conta inexistente.
+     *
+     * @return void
+     */
     public function testSaqueContaInexistente()
     {
         // Chama a rota para sacar R$ 100,00 de uma conta que não existe
@@ -170,5 +217,38 @@ class AccountControllerTest extends TestCase
         $response->assertJson(['error' => 'Conta não encontrada']);
     }
 
+    /**
+     * Teste para verificar a listagem das contas existentes no banco de dados.
+     *
+     * @return void
+     */
+    public function testListarContas()
+    {
+        // Inicia uma transação
+        DB::beginTransaction();
+
+        // Limpa o banco de dados
+        DB::table('accounts')->delete();
+
+        // Cria 10 contas
+        Account::factory()->count(10)->create();
+
+        // Chama a rota para listar as contas
+        $response = $this->get('/api/contas');
+
+        // Verifica se a resposta tem o status HTTP 200 OK
+        $response->assertStatus(200);
+
+        // Verifica se a resposta contém os dados das contas criadas
+        $response->assertJsonStructure([
+            '*' => ['number', 'balance']
+        ]);
+
+        // Verifica se a resposta contém 10 contas
+        $response->assertJsonCount(10);
+
+        // Desfaz as alterações no banco de dados
+        DB::rollBack();
+    }
 
 }
